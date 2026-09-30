@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper."
+title: "NeuroSculptor3D"
+repository-code: "https://github.com/tqxg2018/NeuroSculptor3D"
+license: MIT
+authors:
+  - {family-names: Zhang, given-names: Xun}
+  - {family-names: Xia, given-names: Weihao}
+  - {family-names: Liu, given-names: Yulong}
+  - {family-names: Yang, given-names: Bo}
+  - {family-names: Bozzon, given-names: Alessandro}
+  - {family-names: Wang, given-names: Pan}
+preferred-citation:
+  type: conference-paper
+  title: "Single-Stage fMRI-to-3D Reconstruction via Viewpoint-Aware Embedding and Hierarchical Guidance"
+  collection-title: "Proceedings of the AAAI Conference on Artificial Intelligence"
+  volume: 40
+  issue: 21
+  start: 18037
+  end: 18045
+  year: 2026
+  url: "https://ojs.aaai.org/index.php/AAAI/article/view/38864"
+  authors:
+    - {family-names: Zhang, given-names: Xun}
+    - {family-names: Xia, given-names: Weihao}
+    - {family-names: Liu, given-names: Yulong}
+    - {family-names: Yang, given-names: Bo}
+    - {family-names: Bozzon, given-names: Alessandro}
+    - {family-names: Wang, given-names: Pan}

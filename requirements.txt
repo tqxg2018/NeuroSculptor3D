@@ -1,0 +1,39 @@
+# Installed after the TRELLIS dependencies (see install.sh); versions of the tested environment.
+numpy==1.26.4
+scipy==1.15.3
+pillow==11.1.0
+opencv-python-headless==4.11.0.86
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
+easydict==1.13
+ninja==1.11.1.4
+xatlas==0.0.10
+pymeshfix==0.17.1
+pyvista==0.45.2
+igraph==0.11.9
+safetensors==0.5.3
+plyfile==1.1.2
+moderngl==5.12.0
+glcontext==3.0.0
+huggingface-hub==0.33.0
+transformers==4.52.4
+accelerate==1.7.0
+dalle2-pytorch==1.15.6
+rotary-embedding-torch==0.8.6
+einops==0.8.0
+h5py==3.10.0
+pyyaml==6.0.2
+wandb
+# data preparation (rembg/onnxruntime versions matter for bit-exact DINOv2 targets)
+rembg==2.0.66
+onnxruntime==1.22.0
+open3d==0.19.0
+trimesh==4.6.12
+# evaluation
+lpips==0.1.4
+pyrender==0.1.45
+torchmetrics==1.7.3
+scikit-image==0.25.2
+scikit-learn==1.7.0
+# tests
+pytest

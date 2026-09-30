@@ -1,0 +1,62 @@
+# NeuroSculptor3D, Same-Subject Same-Category (SS-SC). Other subjects: --set data.fmri_h5=data/fmri/sub-000X.hdf5 experiment=ss_sc_sub-000X
+# These are the settings of the paper checkpoint (recovered from the original training logs).
+experiment: ss_sc_sub-0001
+seed: 42
+
+data:
+  fmri_h5: data/fmri/sub-0001.hdf5          # preprocessed single-trial betas (see DATA.md)
+  train_split: data/splits/core_train_list.txt
+  test_split: data/splits/core_test_list.txt
+  feature_root: data/dino_features          # <cat>/<id>/<view>.npy, DINOv2 tokens of the 32 stimulus frames
+  latent_root: data/ss_latents              # <cat>/<id>/latent.npz, TRELLIS sparse-structure latents
+  num_views: 32
+  zscore: train
+  num_workers: 8
+
+model:
+  num_keyvoxel: 512      # G
+  num_neighbor: 32       # K
+  hidden_dim: 1024
+  num_tokens: 2048
+  n_blocks: 1
+  drop: 0.15
+  num_views: 32
+  text_guidance: true
+  structure_guidance: true
+
+prior:
+  depth: 6
+  dim_head: 52
+  timesteps: 100
+  cond_drop_prob: 0.2
+  grad_checkpoint: true   # exact activation checkpointing (saves ~25 GB of GPU memory at batch 4)
+
+train:
+  batch_size: 4
+  num_epochs: 200
+  max_lr: 3.0e-5
+  weight_decay: 0.01
+  mixup_pct: 0.33        # BiMixCo for the first 33% of epochs, SoftCLIP afterwards
+  mixed_precision: fp16
+  eval_every: 1          # epochs; test-set losses are only used for logging
+  save_every: 50         # keep an extra snapshot every N epochs (last.pth is always updated)
+
+loss:
+  prior: 30.0            # diffusion prior (perceptual path)
+  image_latent: 10.0     # contrastive, perceptual path
+  text_latent: 1.0       # contrastive, semantic path
+  structure_latent: 1.0  # contrastive, geometric path
+  structure_mse: 10000.0 # MSE, geometric path
+  dice: 2.0              # voxel Dice through the TRELLIS SS decoder, geometric path
+  text_mse: 0.0          # MSE on CLIP text tokens (described in the paper, not used by the paper checkpoint)
+  use_latent: true       # switches used for the loss ablation (Table 4)
+  use_mse: true
+  use_dice: true
+
+trellis:
+  image_ckpt: JeffreyXiang/TRELLIS-image-large   # HF repo id or local directory
+  text_encoder: openai/clip-vit-large-patch14
+
+output_dir: outputs
+wandb: false
+wandb_project: NeuroSculptor3D

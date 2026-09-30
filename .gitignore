@@ -1,0 +1,18 @@
+# local data, experiment outputs and build artifacts (anchored to the repository root)
+/data/
+/outputs/
+/results/
+/checkpoints/
+/build/
+wandb/
+
+# python / compiled
+__pycache__/
+*.pyc
+*.egg-info/
+*.so
+third_party/PyTorchEMD/build/
+
+# weights
+*.pth
+*.safetensors
