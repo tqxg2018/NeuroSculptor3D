@@ -208,12 +208,6 @@ FPD uses the 13-class ShapeNet PointNet classifier of the MinD-3D evaluation cod
 added). `bash scripts/eval_all.sh` reconstructs and evaluates every setting and writes the tables to
 `results/RESULTS.md`. Details: [docs/EVALUATION.md](docs/EVALUATION.md).
 
-## Results
-
-Training of the released checkpoints is in progress; the tables will be added here. The numbers obtained with this
-code differ from those reported in the paper; see [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for the exact
-configuration and how the re-implementation was verified against the original research code.
-
 ## Repository structure
 
 ```
