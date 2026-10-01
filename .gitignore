@@ -16,3 +16,4 @@ third_party/PyTorchEMD/build/
 # weights
 *.pth
 *.safetensors
+/release/

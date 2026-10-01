@@ -6,10 +6,11 @@ the paper, which were obtained with an earlier version of the code, data and eva
 
 ## Training configuration
 
-The model, losses and optimisation follow the configuration of the original subject-1 checkpoint (recovered from its
-state dict and training logs):
+The released code does not change the method: model, losses and optimisation are those of the original research code
+that trained the paper's subject-1 checkpoint (recovered from its state dict and training logs). The table lists the
+places where the paper text does not describe what that code did; the release follows the code.
 
-| | released config | text of the paper |
+| | original code = this release | text of the paper |
 |---|---|---|
 | epochs | 200 | 300 |
 | batch size / max. LR / schedule | 4 / 3e-5 / one-cycle | same |

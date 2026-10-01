@@ -11,7 +11,7 @@ Xun Zhang<sup>1</sup>, Weihao Xia<sup>2</sup>, Yulong Liu<sup>3</sup>, Bo Yang<s
 <sup>1</sup>Delft University of Technology &nbsp; <sup>2</sup>University of Cambridge &nbsp;
 <sup>3</sup>The Hong Kong University of Science and Technology &nbsp; <sup>4</sup>The Hong Kong Polytechnic University
 
-[**Paper**](https://ojs.aaai.org/index.php/AAAI/article/view/38864) &nbsp;|&nbsp; **Data** (Hugging Face, coming soon) &nbsp;|&nbsp; **Checkpoints** (Hugging Face, coming soon)
+[**Paper**](https://ojs.aaai.org/index.php/AAAI/article/view/38864) &nbsp;|&nbsp; [**Data & checkpoints (Hugging Face)**](https://huggingface.co/datasets/tqxg2022/NeuroSculptor3D-data)
 
 </div>
 
@@ -34,7 +34,8 @@ textured meshes. The semantic and geometric paths act as training-time guidance 
 
 ## News
 
-* **2026-09** - Code released. Preprocessed data and checkpoints of the re-trained models will follow on Hugging Face.
+* **2026-10** - Preprocessed data released on [Hugging Face](https://huggingface.co/datasets/tqxg2022/NeuroSculptor3D-data); checkpoints will be added to the same repository.
+* **2026-09** - Code released.
 
 ## Contents
 
@@ -45,7 +46,6 @@ textured meshes. The semantic and geometric paths act as training-time guidance 
 * [Training](#training)
 * [Inference](#inference)
 * [Evaluation](#evaluation)
-* [Results](#results)
 * [Repository structure](#repository-structure)
 * [Citation](#citation)
 
@@ -70,8 +70,15 @@ copy). Set `TRELLIS_ROOT` to use another TRELLIS checkout.
 ## Data
 
 NeuroSculptor3D is trained on [fMRI-Shape](https://huggingface.co/datasets/Fudan-fMRI/fMRI-Shape) (Gao et al., 2024):
-participants watched 8-second videos of ShapeNet objects rotating 360 degrees. We release the preprocessed data on
-Hugging Face (coming soon). After downloading, the `data/` folder looks like:
+participants watched 8-second videos of ShapeNet objects rotating 360 degrees. The preprocessed data and our
+checkpoints are in one Hugging Face repository, [tqxg2022/NeuroSculptor3D-data](https://huggingface.co/datasets/tqxg2022/NeuroSculptor3D-data) (4.9 GB):
+
+```bash
+huggingface-cli download tqxg2022/NeuroSculptor3D-data --repo-type dataset --local-dir data
+cd data && sha256sum -c --ignore-missing SHA256SUMS && for f in frames frames_518 ss_latents; do tar -xf $f.tar; done && cd ..
+```
+
+Add `--exclude "checkpoints/*"` to download only the data. The `data/` folder then looks like:
 
 ```
 data/
@@ -79,7 +86,8 @@ data/
 ├── splits/                             # core_train_list, core_test_list, apt_sub0009_list, apact_sub0011_list
 ├── frames/<cat>/<id>/<v>.jpg           # 32 viewpoint frames (224x224) of each stimulus video
 ├── frames_518/<cat>/<id>/<v>.png       # the same frames after TRELLIS preprocessing (background removed, 518 px)
-└── ss_latents/<cat>/<id>/latent.npz    # TRELLIS sparse-structure latents (geometric-path targets)
+├── ss_latents/<cat>/<id>/latent.npz    # TRELLIS sparse-structure latents (geometric-path targets)
+└── checkpoints/<model>/                # released models: model.safetensors + config.json
 ```
 
 **Perceptual-path targets.** Encode every preprocessed frame with DINOv2 (~250 GB as float32, `--fp16` halves it).
@@ -111,26 +119,32 @@ from the original fMRI-Shape release.
 
 ## Pretrained models
 
-Checkpoints will be released on Hugging Face (coming soon):
+Checkpoints are stored in the `checkpoints/` folder of the [Hugging Face repository](https://huggingface.co/datasets/tqxg2022/NeuroSculptor3D-data), one folder per model
+with `model.safetensors` (brain encoder 86M + diffusion prior 102M parameters) and its `config.json`. To download a
+single model:
 
-| Model | Training data | Used for |
-|---|---|---|
-| `ss_sc_sub-0001` ... `ss_sc_sub-0008` | subject 1 ... 8 | SS-SC; `ss_sc_sub-0001` also for NS-SC and NS-NC |
-| `abl_no_semantic`, `abl_no_geometric`, `abl_no_guidance` | subject 1 | hierarchical-guidance ablation |
-| `abl_loss_latent_only`, `abl_loss_mse_only`, `abl_loss_latent_mse` | subject 1 | loss ablation |
+```bash
+huggingface-cli download tqxg2022/NeuroSculptor3D-data --repo-type dataset --local-dir data \
+    --include "checkpoints/ss_sc_sub-0001/*"
+```
 
-Each checkpoint is a `model.safetensors` (brain encoder 86M + diffusion prior 102M parameters) with its `config.json`.
+| Model | Training data | Used for | Status |
+|---|---|---|---|
+| `ss_sc_sub-0001` | subject 1 | SS-SC; also NS-SC (subject 9) and NS-NC (subject 11) | training |
+| `ss_sc_sub-0002` ... `ss_sc_sub-0008` | subject 2 ... 8 | SS-SC | planned |
+| `abl_no_semantic`, `abl_no_geometric`, `abl_no_guidance` | subject 1 | hierarchical-guidance ablation | planned |
+| `abl_loss_latent_only`, `abl_loss_mse_only`, `abl_loss_latent_mse` | subject 1 | loss ablation | planned |
 
 ## Quick start
 
 Reconstruct the 104 test objects of subject 1 and evaluate them:
 
 ```bash
-python scripts/inference.py --ckpt checkpoints/ss_sc_sub-0001/model.safetensors --out results/ss_sc_sub-0001
-python scripts/evaluate.py --pred results/ss_sc_sub-0001 --gt data/gt/core_test \
-    --split data/splits/core_test_list.txt --fpd_ckpt checkpoints/pointnet_fpd.pth
+python scripts/inference.py --ckpt data/checkpoints/ss_sc_sub-0001/model.safetensors --out results/ss_sc_sub-0001
+python scripts/evaluate.py --pred results/ss_sc_sub-0001 --gt data/gt/core_test --split data/splits/core_test_list.txt
 ```
 
+FPD is computed in addition when a PointNet checkpoint is passed with `--fpd_ckpt` (see [Evaluation](#evaluation)).
 Each result folder contains `gaussian.ply` (3D Gaussians) and six rendered views; add `--save_glb` to export a
 textured mesh (`mesh.glb`).
 
@@ -190,7 +204,7 @@ python scripts/inference.py --ckpt <model.safetensors | training .pth> --out <fo
 For example, the NS-NC setting:
 
 ```bash
-python scripts/inference.py --ckpt checkpoints/ss_sc_sub-0001/model.safetensors --out results/ns_nc_sub-0011 \
+python scripts/inference.py --ckpt data/checkpoints/ss_sc_sub-0001/model.safetensors --out results/ns_nc_sub-0011 \
     --fmri_h5 data/fmri/sub-0011.hdf5 --split data/splits/apact_sub0011_list.txt --zscore self
 ```
 

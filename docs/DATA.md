@@ -2,8 +2,9 @@
 
 NeuroSculptor3D is trained and evaluated on [fMRI-Shape](https://huggingface.co/datasets/Fudan-fMRI/fMRI-Shape)
 (Gao et al., MinD-3D, ECCV 2024; Apache-2.0): participants watched 8-second videos of ShapeNet objects rotating
-360 degrees. We provide the preprocessed data on Hugging Face; this page describes the format and how every file can
-be rebuilt.
+360 degrees. We provide the preprocessed data (and our checkpoints, in `checkpoints/`) on Hugging Face at
+[tqxg2022/NeuroSculptor3D-data](https://huggingface.co/datasets/tqxg2022/NeuroSculptor3D-data); this page describes the
+format and how every file can be rebuilt.
 
 ## Released files
 
