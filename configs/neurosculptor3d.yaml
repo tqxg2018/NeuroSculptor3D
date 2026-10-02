@@ -1,5 +1,5 @@
 # NeuroSculptor3D, Same-Subject Same-Category (SS-SC). Other subjects: --set data.fmri_h5=data/fmri/sub-000X.hdf5 experiment=ss_sc_sub-000X
-# These are the settings of the paper checkpoint (recovered from the original training logs).
+# Default training configuration (used for the released checkpoints).
 experiment: ss_sc_sub-0001
 seed: 42
 
@@ -48,7 +48,7 @@ loss:
   structure_latent: 1.0  # contrastive, geometric path
   structure_mse: 10000.0 # MSE, geometric path
   dice: 2.0              # voxel Dice through the TRELLIS SS decoder, geometric path
-  text_mse: 0.0          # MSE on CLIP text tokens (described in the paper, not used by the paper checkpoint)
+  text_mse: 0.0          # optional MSE on CLIP text tokens (off by default)
   use_latent: true       # switches used for the loss ablation (Table 4)
   use_mse: true
   use_dice: true
