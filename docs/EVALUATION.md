@@ -36,8 +36,8 @@ surface of the normalised ShapeNet mesh. Tables report FPD x 1e-1, CD x 1e2 and 
 | point-cloud frames | prediction y-up, ground truth z-up | ground truth rotated to y-up |
 | point-cloud normalisation | none | both centred and scaled into a sphere of radius 0.5 |
 
-`paper` reproduces the evaluation that was used for the numbers in the paper. `corrected` removes the frame mismatch
-and scale sensitivity of the structural metrics and uses LPIPS as intended; we report both.
+`paper` follows the evaluation script used for the paper. `corrected` removes the frame mismatch and scale
+sensitivity of the structural metrics and uses LPIPS as intended; `scripts/eval_all.sh` computes both.
 
 FPD is computed from only 104 (or 220) point clouds with 1,805-d features, so its covariance estimate is rank-deficient
 and the value varies noticeably with the random point sampling; CD/EMD and the image metrics are stable.

@@ -87,7 +87,7 @@ data/
 ├── frames/<cat>/<id>/<v>.jpg           # 32 viewpoint frames (224x224) of each stimulus video
 ├── frames_518/<cat>/<id>/<v>.png       # the same frames after TRELLIS preprocessing (background removed, 518 px)
 ├── ss_latents/<cat>/<id>/latent.npz    # TRELLIS sparse-structure latents (geometric-path targets)
-└── checkpoints/<model>/                # released models: model.safetensors + config.json
+└── checkpoints/                        # released models (<model>/model.safetensors + config.json), pointnet_fpd.pth
 ```
 
 **Perceptual-path targets.** Encode every preprocessed frame with DINOv2 (~250 GB as float32, `--fp16` halves it).
@@ -114,8 +114,8 @@ python scripts/data/prepare_gt.py --shapenet_root /path/to/ShapeNetCore.v2 \
 | New-Subject Same-Category (NS-SC) | subject 1 | subject 9 | the same 104 objects |
 | New-Subject New-Category (NS-NC) | subject 1 | subject 11 | 220 objects of 55 categories (42 unseen) |
 
-[docs/DATA.md](docs/DATA.md) describes the file formats, the fMRI preprocessing and how every file can be rebuilt
-from the original fMRI-Shape release.
+[docs/DATA.md](docs/DATA.md) describes the file formats, the fMRI preprocessing, and how the frames, perceptual and
+geometric targets and the evaluation ground truth are derived.
 
 ## Pretrained models
 
@@ -141,10 +141,10 @@ Reconstruct the 104 test objects of subject 1 and evaluate them:
 
 ```bash
 python scripts/inference.py --ckpt data/checkpoints/ss_sc_sub-0001/model.safetensors --out results/ss_sc_sub-0001
-python scripts/evaluate.py --pred results/ss_sc_sub-0001 --gt data/gt/core_test --split data/splits/core_test_list.txt
+python scripts/evaluate.py --pred results/ss_sc_sub-0001 --gt data/gt/core_test --split data/splits/core_test_list.txt \
+    --fpd_ckpt data/checkpoints/pointnet_fpd.pth
 ```
 
-FPD is computed in addition when a PointNet checkpoint is passed with `--fpd_ckpt` (see [Evaluation](#evaluation)).
 Each result folder contains `gaussian.ply` (3D Gaussians) and six rendered views; add `--save_glb` to export a
 textured mesh (`mesh.glb`).
 
@@ -157,8 +157,8 @@ accelerate launch --num_processes 1 --mixed_precision fp16 scripts/train.py \
     --config configs/neurosculptor3d.yaml --set data.fmri_h5=data/fmri/sub-0001.hdf5 experiment=ss_sc_sub-0001
 ```
 
-Any config entry can be overridden with `--set key=value`. Training takes about one day on an H100 and ~18 GB of GPU
-memory. `outputs/<experiment>/` holds `last.pth` (training resumes from it automatically), weight snapshots every 50
+Any config entry can be overridden with `--set key=value`. One run (200 epochs) takes about 1-1.5 days on one H100 and needs
+~18 GB of GPU memory. `outputs/<experiment>/` holds `last.pth` (training resumes from it automatically), weight snapshots every 50
 epochs, `config.json` and per-epoch losses/retrieval accuracies in `metrics.jsonl` (set `wandb: true` for
 Weights & Biases). `tools/export_checkpoint.py` converts a snapshot into the released `safetensors` format.
 
@@ -195,7 +195,7 @@ python scripts/inference.py --ckpt <model.safetensors | training .pth> --out <fo
 
 | Option | Meaning |
 |---|---|
-| `--num_viewpoints d` | number of decoded viewpoints (default 5, evenly spaced over the 32 frame ids) |
+| `--num_viewpoints d` | number of decoded viewpoints, evenly spaced over the 32 frame ids (default 5: ids 0, 8, 16, 23, 31) |
 | `--fmri_h5`, `--split`, `--zscore self` | evaluate on another subject (NS-SC / NS-NC); subjects without training trials are z-scored with their own statistics |
 | `--save_glb` | also export a textured mesh |
 | `--use_gt_features` | condition TRELLIS on the ground-truth DINOv2 tokens of the same frames (upper bound) |
@@ -218,9 +218,11 @@ reported as FPD x 1e-1, CD x 1e2, EMD x 1e2 following MinD-3D).
 * `--protocol corrected` feeds LPIPS images in [-1, 1], rotates the z-up ground-truth meshes into the y-up frame of the
   reconstructions and normalises both point clouds.
 
-FPD uses the 13-class ShapeNet PointNet classifier of the MinD-3D evaluation code (`--fpd_ckpt`; download link will be
-added). `bash scripts/eval_all.sh` reconstructs and evaluates every setting and writes the tables to
-`results/RESULTS.md`. Details: [docs/EVALUATION.md](docs/EVALUATION.md).
+FPD uses the 13-class ShapeNet PointNet classifier of the MinD-3D evaluation code, provided in the Hugging Face
+repository as `checkpoints/pointnet_fpd.pth` (pass it with `--fpd_ckpt`; FPD is skipped without it).
+`bash scripts/eval_all.sh` reconstructs and evaluates every setting and writes the tables to `results/RESULTS.md`; for
+each model it uses your own training output (`outputs/<model>/model_epoch200.pth`) if present, otherwise the
+downloaded checkpoint (`data/checkpoints/<model>/model.safetensors`). Details: [docs/EVALUATION.md](docs/EVALUATION.md).
 
 ## Repository structure
 
@@ -239,7 +241,7 @@ NeuroSculptor3D/
 │   └── data/                        # frame extraction, preprocessing, DINOv2 targets, SS latents, ground truth
 ├── tools/                           # release helpers (checkpoint export, dataset packing)
 ├── tests/                           # CPU unit tests (python -m pytest tests)
-├── docs/                            # DATA.md, EVALUATION.md, REPRODUCIBILITY.md
+├── docs/                            # DATA.md, EVALUATION.md
 └── third_party/                     # TRELLIS (submodule), PyTorchEMD
 ```
 

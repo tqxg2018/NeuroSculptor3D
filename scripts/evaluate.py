@@ -1,13 +1,13 @@
 """Evaluate reconstructions: 2-way / 10-way top-1, LPIPS, SSIM (image level) and FPD, CD, EMD (structure level).
 
     python scripts/evaluate.py --pred results/ss_sc_sub01 --gt data/gt/core_test \
-        --split data/splits/core_test_list.txt --fpd_ckpt checkpoints/pointnet_fpd.pth
+        --split data/splits/core_test_list.txt --fpd_ckpt data/checkpoints/pointnet_fpd.pth
 
 Expected layout
     <pred>/<cat>_<id>/render_{0..5}.jpg, gaussian.ply   (written by scripts/inference.py)
     <gt>/<cat>_<id>/gt_{0..5}.jpg, mesh.ply             (written by scripts/data/prepare_gt.py)
 
-`--protocol paper` (default) reproduces the evaluation used for the paper tables: LPIPS on [0,1] inputs, point
+`--protocol paper` (default) follows the evaluation script used for the paper tables: LPIPS on [0,1] inputs, point
 clouds compared in their native frames without normalisation, 3D-Gaussian centres as the predicted point cloud.
 `--protocol corrected` uses LPIPS on [-1,1] inputs, rotates the z-up GT meshes into the y-up frame of the
 predictions and normalises both point clouds into the unit sphere.

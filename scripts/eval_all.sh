@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Reconstruct + evaluate everything reported in the README (run after scripts/train_all.sh).
-#   FPD_CKPT=checkpoints/pointnet_fpd.pth bash scripts/eval_all.sh
+#   bash scripts/eval_all.sh            (FPD checkpoint: data/checkpoints/pointnet_fpd.pth, override with FPD_CKPT=...)
 set -e
 cd "$(dirname "$0")/.."
-FPD_CKPT=${FPD_CKPT:-checkpoints/pointnet_fpd.pth}
-CKPT() { echo "outputs/$1/model_epoch200.pth"; }
+FPD_CKPT=${FPD_CKPT:-data/checkpoints/pointnet_fpd.pth}
+# your own training output if present, otherwise the checkpoint downloaded from Hugging Face
+CKPT() { if [ -f "outputs/$1/model_epoch200.pth" ]; then echo "outputs/$1/model_epoch200.pth"; else echo "data/checkpoints/$1/model.safetensors"; fi; }
 
 evaluate() {  # <pred dir> <gt dir> <split>
     for p in paper corrected; do
