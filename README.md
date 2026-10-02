@@ -34,7 +34,7 @@ textured meshes. The semantic and geometric paths act as training-time guidance 
 
 ## News
 
-* **2026-10** - Preprocessed data released on [Hugging Face](https://huggingface.co/datasets/tqxg2022/NeuroSculptor3D-data); checkpoints will be added to the same repository.
+* **2026-10** - Preprocessed data and the subject-1 checkpoint (`ss_sc_sub-0001`) released on [Hugging Face](https://huggingface.co/datasets/tqxg2022/NeuroSculptor3D-data); the other checkpoints will be added to the same repository.
 * **2026-09** - Code released.
 
 ## Contents
@@ -130,7 +130,7 @@ huggingface-cli download tqxg2022/NeuroSculptor3D-data --repo-type dataset --loc
 
 | Model | Training data | Used for | Status |
 |---|---|---|---|
-| `ss_sc_sub-0001` | subject 1 | SS-SC; also NS-SC (subject 9) and NS-NC (subject 11) | training |
+| `ss_sc_sub-0001` | subject 1 | SS-SC; also NS-SC (subject 9) and NS-NC (subject 11) | available |
 | `ss_sc_sub-0002` ... `ss_sc_sub-0008` | subject 2 ... 8 | SS-SC | planned |
 | `abl_no_semantic`, `abl_no_geometric`, `abl_no_guidance` | subject 1 | hierarchical-guidance ablation | planned |
 | `abl_loss_latent_only`, `abl_loss_mse_only`, `abl_loss_latent_mse` | subject 1 | loss ablation | planned |
